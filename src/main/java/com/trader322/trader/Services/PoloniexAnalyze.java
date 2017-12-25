@@ -1,6 +1,7 @@
 package com.trader322.trader.Services;
 
 
+import com.trader322.trader.ChatBot.BotMessageListener;
 import com.trader322.trader.Model.PoloniexModel;
 import com.trader322.trader.Repository.PoloniexCurrencyRepository;
 import com.trader322.trader.Utils.Utils;
@@ -21,7 +22,13 @@ public class PoloniexAnalyze {
     @Autowired
     private PoloniexCurrencyRepository poloniexCurrencyRepository;
 
-    PoloniexAnalyze(PoloniexCurrencyRepository poloniexCurrencyRepository){
+    private BotMessageListener botMessageListener;
+
+    PoloniexAnalyze(
+        PoloniexCurrencyRepository poloniexCurrencyRepository,
+        BotMessageListener botMessageListener
+    ){
+        this.botMessageListener = botMessageListener;
         this.poloniexCurrencyRepository = poloniexCurrencyRepository;
     }
 
@@ -52,12 +59,15 @@ public class PoloniexAnalyze {
 
         for (Map.Entry<String, List<PoloniexModel>> entry : mapPoloniexModel.entrySet()) {
             Long currentTime = timestamp.getTime();
-            PoloniexModel lastPoloniex = entry.getValue().get(0);
+            PoloniexModel lastPoloniex = entry.getValue().get(entry.getValue().size() - 1);
 
             entry.getValue().forEach(
                 (PoloniexModel poloniexModel) -> {
 
-                    if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 60000)){
+                    if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 60001)){
+                        this.botMessageListener.SendMessage(this.botMessageListener.pumpAndDumpsChannel, "test");
+
+
                         System.out.println(WHITE + ("https://poloniex.com/exchange#"+poloniexModel.getName()));
 
 //                            logic of 1 minute
