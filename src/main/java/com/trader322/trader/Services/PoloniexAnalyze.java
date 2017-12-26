@@ -35,17 +35,17 @@ public class PoloniexAnalyze {
 
     public void sendMessage(PoloniexModel lastPoloniex, PoloniexModel poloniexModel, String messageInterval){
         double calculatedValue = ((lastPoloniex.getLast() - poloniexModel.getLast())/ lastPoloniex.getLast()) * 100;
-        if (calculatedValue > 0.5 || calculatedValue < -0.5) {
+        if (calculatedValue > 2 || calculatedValue < -2) {
             DecimalFormat df = new DecimalFormat("#.##");
             String value = df.format(calculatedValue);
             String helpValue;
             if (calculatedValue > 0.5){
-                helpValue = new Date(poloniexModel.getPoloniexIdentity().getTimestamp()) + " " + poloniexModel.getName() + " " + value + "%";
+                helpValue = new Date(poloniexModel.getPoloniexIdentity().getTimestamp()) + " " + messageInterval + " " + poloniexModel.getName() + " " + value + "%";
             } else {
-                helpValue = new Date(poloniexModel.getPoloniexIdentity().getTimestamp()) + " " + poloniexModel.getName() + " " + value + "%";
+                helpValue = new Date(poloniexModel.getPoloniexIdentity().getTimestamp()) + " " + messageInterval + " " + poloniexModel.getName() + " " + value + "%";
             }
 
-            this.coinText += "\n " + messageInterval + helpValue;
+            this.coinText += "\n " + helpValue;
 
         }
     }
@@ -78,36 +78,31 @@ public class PoloniexAnalyze {
             PoloniexModel lastPoloniex = entry.getValue().get(entry.getValue().size() - 1);
 
             this.coinText = "```";
-            this.coinText += "\n https://poloniex.com/exchange#" + lastPoloniex.getName() + "[link]";
+            this.coinText += "\n https://poloniex.com/exchange#" + lastPoloniex.getName();
 
-            AtomicInteger i = new AtomicInteger();
+            String coinName = lastPoloniex.getName().split("_")[0];
+
+            String cacheString = this.coinText;
+
             entry.getValue().forEach(
                 (PoloniexModel poloniexModel) -> {
 
                     if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 60001)){
                         this.sendMessage(lastPoloniex, poloniexModel, "1 minute:  ");
-                        i.getAndIncrement();
                     } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 120000)) {
                         this.sendMessage(lastPoloniex, poloniexModel, "2 minute:  ");
-                        i.getAndIncrement();
                     } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 300000)) {
                         this.sendMessage(lastPoloniex, poloniexModel, "5 minute:  ");
-                        i.getAndIncrement();
                     } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 600000)) {
                         this.sendMessage(lastPoloniex, poloniexModel, "10 minute: ");
-                        i.getAndIncrement();
                     } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 900000)) {
                         this.sendMessage(lastPoloniex, poloniexModel, "15 minute: ");
-                        i.getAndIncrement();
                     } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 1200000)) {
                         this.sendMessage(lastPoloniex, poloniexModel, "20 minute: ");
-                        i.getAndIncrement();
                     } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 1500000)) {
                         this.sendMessage(lastPoloniex, poloniexModel, "25 minute: ");
-                        i.getAndIncrement();
                     } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 1800000)) {
                         this.sendMessage(lastPoloniex, poloniexModel, "30 minute: ");
-                        i.getAndIncrement();
                     } else {
 
                     }
@@ -115,11 +110,11 @@ public class PoloniexAnalyze {
             );
 
 
-            this.coinText += "```";
 
-            if (i.get() > 0){
+            if (!cacheString.equals(this.coinText)){
+                this.coinText += "```";
                 this.botMessageListener.SendMessage(
-                        this.botMessageListener.pumpAndDumpsChannel,
+                        coinName,
                         this.coinText
                 );
             }

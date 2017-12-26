@@ -18,13 +18,16 @@ import java.util.Random;
 
 public class BotMessageListener extends ListenerAdapter{
 
+    private TextChannel btcChannel;
+    private TextChannel usdtChannel;
+    private TextChannel xmrChannel;
+    private TextChannel ethChannel;
+
     public BotMessageListener(){
 
     }
 
     public JDA jda;
-
-    public TextChannel pumpAndDumpsChannel;
 
     /**
      * This is the method where the program starts.
@@ -41,8 +44,14 @@ public class BotMessageListener extends ListenerAdapter{
                     .buildBlocking();  //There are 2 ways to login, blocking vs async. Blocking guarantees that JDA will be completely loaded.
 
             this.jda.getTextChannels().forEach(TextChannel->{
-                if (TextChannel.getName().equals("dumpsandpumps")){
-                    this.pumpAndDumpsChannel = TextChannel;
+                if (TextChannel.getName().equals("btc")){
+                    this.btcChannel = TextChannel;
+                } else if (TextChannel.getName().equals("usdt")){
+                    this.usdtChannel = TextChannel;
+                } else if (TextChannel.getName().equals("xmr")){
+                    this.xmrChannel = TextChannel;
+                } else if (TextChannel.getName().equals("eth")){
+                    this.ethChannel = TextChannel;
                 }
             });
 
@@ -71,9 +80,23 @@ public class BotMessageListener extends ListenerAdapter{
         }
     }
 
-    public void SendMessage(TextChannel channel, String message){
-        System.out.println(channel);
-        channel.sendMessage(message).queue();
+    public void SendMessage(String coinName, String message){
+
+        switch (coinName.toLowerCase()) {
+            case "btc":
+                this.btcChannel.sendMessage(message).queue();
+                break;
+            case "usdt":
+                this.usdtChannel.sendMessage(message).queue();
+                break;
+            case "xmr":
+                this.xmrChannel.sendMessage(message).queue();
+                break;
+            case "eth":
+                this.ethChannel.sendMessage(message).queue();
+                break;
+        }
+
     }
 
 
@@ -356,5 +379,52 @@ public class BotMessageListener extends ListenerAdapter{
 //            }
 //        });
 //    }
+
+
+    public TextChannel getBtcChannel() {
+        return btcChannel;
+    }
+
+    public BotMessageListener setBtcChannel(TextChannel btcChannel) {
+        this.btcChannel = btcChannel;
+        return this;
+    }
+
+    public TextChannel getUsdtChannel() {
+        return usdtChannel;
+    }
+
+    public BotMessageListener setUsdtChannel(TextChannel usdtChannel) {
+        this.usdtChannel = usdtChannel;
+        return this;
+    }
+
+    public TextChannel getXmrChannel() {
+        return xmrChannel;
+    }
+
+    public BotMessageListener setXmrChannel(TextChannel xmrChannel) {
+        this.xmrChannel = xmrChannel;
+        return this;
+    }
+
+    public TextChannel getEthChannel() {
+        return ethChannel;
+    }
+
+    public BotMessageListener setEthChannel(TextChannel ethChannel) {
+        this.ethChannel = ethChannel;
+        return this;
+    }
+
+    public JDA getJda() {
+        return jda;
+    }
+
+    public BotMessageListener setJda(JDA jda) {
+        this.jda = jda;
+        return this;
+    }
+
 
 }
