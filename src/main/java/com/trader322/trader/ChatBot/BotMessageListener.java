@@ -22,6 +22,8 @@ public class BotMessageListener extends ListenerAdapter{
 
     }
 
+    public JDA jda;
+
     public TextChannel pumpAndDumpsChannel;
 
     /**
@@ -33,12 +35,12 @@ public class BotMessageListener extends ListenerAdapter{
 
         try
         {
-            JDA jda = new JDABuilder(AccountType.BOT)
+            this.jda = new JDABuilder(AccountType.BOT)
                     .setToken("MzkzMDA3MzQxNzk0MDk5MjAx.DR1ulw.wUtcqYrV_qE123SpWufWRX5SjUE")           //The token of the account that is logging in.
                     .addEventListener(new BotMessageListener())
                     .buildBlocking();  //There are 2 ways to login, blocking vs async. Blocking guarantees that JDA will be completely loaded.
 
-            jda.getTextChannels().forEach(TextChannel->{
+            this.jda.getTextChannels().forEach(TextChannel->{
                 if (TextChannel.getName().equals("dumpsandpumps")){
                     this.pumpAndDumpsChannel = TextChannel;
                 }
@@ -71,7 +73,7 @@ public class BotMessageListener extends ListenerAdapter{
 
     public void SendMessage(TextChannel channel, String message){
         System.out.println(channel);
-        channel.sendMessage(message);
+        channel.sendMessage(message).queue();
     }
 
 

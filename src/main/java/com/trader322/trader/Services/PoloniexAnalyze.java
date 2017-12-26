@@ -10,10 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.util.*;
-import java.util.stream.Stream;
-
-import static com.trader322.trader.Utils.ConsoleColors.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service("poloniexAnalyze")
 @Transactional
@@ -30,6 +29,25 @@ public class PoloniexAnalyze {
     ){
         this.botMessageListener = botMessageListener;
         this.poloniexCurrencyRepository = poloniexCurrencyRepository;
+    }
+
+    public String coinText = "";
+
+    public void sendMessage(PoloniexModel lastPoloniex, PoloniexModel poloniexModel, String messageInterval){
+        double calculatedValue = ((lastPoloniex.getLast() - poloniexModel.getLast())/ lastPoloniex.getLast()) * 100;
+        if (calculatedValue > 0.5 || calculatedValue < -0.5) {
+            DecimalFormat df = new DecimalFormat("#.##");
+            String value = df.format(calculatedValue);
+            String helpValue;
+            if (calculatedValue > 0.5){
+                helpValue = new Date(poloniexModel.getPoloniexIdentity().getTimestamp()) + " " + poloniexModel.getName() + " " + value + "%";
+            } else {
+                helpValue = new Date(poloniexModel.getPoloniexIdentity().getTimestamp()) + " " + poloniexModel.getName() + " " + value + "%";
+            }
+
+            this.coinText += "\n " + messageInterval + helpValue;
+
+        }
     }
 
 //    TODO: change type if need
@@ -53,69 +71,58 @@ public class PoloniexAnalyze {
             }
         );
 
-        System.out.println(poloniexModelList);
-
         String discordResponse;
 
         for (Map.Entry<String, List<PoloniexModel>> entry : mapPoloniexModel.entrySet()) {
             Long currentTime = timestamp.getTime();
             PoloniexModel lastPoloniex = entry.getValue().get(entry.getValue().size() - 1);
 
+            this.coinText = "```";
+            this.coinText += "\n https://poloniex.com/exchange#" + lastPoloniex.getName() + "[link]";
+
+            AtomicInteger i = new AtomicInteger();
             entry.getValue().forEach(
                 (PoloniexModel poloniexModel) -> {
 
                     if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 60001)){
-                        this.botMessageListener.SendMessage(this.botMessageListener.pumpAndDumpsChannel, "test");
-
-
-                        System.out.println(WHITE + ("https://poloniex.com/exchange#"+poloniexModel.getName()));
-
-//                            logic of 1 minute
-                        System.out.println(
-                                YELLOW_BOLD + "1 minute: " +
-                                BLUE + poloniexModel.getName() + " " +
-                                YELLOW + (((lastPoloniex.getLast() - poloniexModel.getLast())/ lastPoloniex.getLast()) * 100) + GREEN + "%"
-                        );
+                        this.sendMessage(lastPoloniex, poloniexModel, "1 minute:  ");
+                        i.getAndIncrement();
                     } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 120000)) {
-                        System.out.println(
-                                YELLOW_BOLD + "2 minute: " +
-                                BLUE + poloniexModel.getName() + " " +
-                                YELLOW + (((lastPoloniex.getLast() - poloniexModel.getLast())/ lastPoloniex.getLast()) * 100) + GREEN + "%");
+                        this.sendMessage(lastPoloniex, poloniexModel, "2 minute:  ");
+                        i.getAndIncrement();
                     } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 300000)) {
-                        System.out.println(
-                                YELLOW_BOLD + "5 minute: " +
-                                BLUE + poloniexModel.getName() + " " +
-                                YELLOW + (((lastPoloniex.getLast() - poloniexModel.getLast())/ lastPoloniex.getLast()) * 100) + GREEN + "%");
+                        this.sendMessage(lastPoloniex, poloniexModel, "5 minute:  ");
+                        i.getAndIncrement();
                     } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 600000)) {
-                        System.out.println(
-                                YELLOW_BOLD + "10 minutes: " +
-                                        BLUE + poloniexModel.getName() + " " +
-                                        YELLOW + (((lastPoloniex.getLast() - poloniexModel.getLast())/ lastPoloniex.getLast()) * 100) + GREEN + "%");
+                        this.sendMessage(lastPoloniex, poloniexModel, "10 minute: ");
+                        i.getAndIncrement();
                     } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 900000)) {
-                        System.out.println(
-                                YELLOW_BOLD + "15 minutes: " +
-                                        BLUE + poloniexModel.getName() + " " +
-                                        YELLOW + (((lastPoloniex.getLast() - poloniexModel.getLast())/ lastPoloniex.getLast()) * 100) + GREEN + "%");
+                        this.sendMessage(lastPoloniex, poloniexModel, "15 minute: ");
+                        i.getAndIncrement();
                     } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 1200000)) {
-                        System.out.println(
-                                YELLOW_BOLD + "20 minutes: " +
-                                BLUE + poloniexModel.getName() + " " +
-                                YELLOW + (((lastPoloniex.getLast() - poloniexModel.getLast())/ lastPoloniex.getLast()) * 100) + GREEN + "%");
+                        this.sendMessage(lastPoloniex, poloniexModel, "20 minute: ");
+                        i.getAndIncrement();
                     } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 1500000)) {
-                        System.out.println(
-                                YELLOW_BOLD + "25 minutes: " +
-                                        BLUE + poloniexModel.getName() + " " +
-                                        YELLOW + (((lastPoloniex.getLast() - poloniexModel.getLast())/ lastPoloniex.getLast()) * 100) + GREEN + "%");
+                        this.sendMessage(lastPoloniex, poloniexModel, "25 minute: ");
+                        i.getAndIncrement();
                     } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 1800000)) {
-                        System.out.println(
-                                YELLOW_BOLD + "30 minutes: " +
-                                        BLUE + poloniexModel.getName() + " " +
-                                        YELLOW + (((lastPoloniex.getLast() - poloniexModel.getLast())/ lastPoloniex.getLast()) * 100) + GREEN + "%");
+                        this.sendMessage(lastPoloniex, poloniexModel, "30 minute: ");
+                        i.getAndIncrement();
                     } else {
 
                     }
                 }
             );
+
+
+            this.coinText += "```";
+
+            if (i.get() > 0){
+                this.botMessageListener.SendMessage(
+                        this.botMessageListener.pumpAndDumpsChannel,
+                        this.coinText
+                );
+            }
 
 //            System.out.println(entry.getValue());
 
