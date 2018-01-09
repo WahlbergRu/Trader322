@@ -78,7 +78,17 @@ public class PoloniexAnalyze {
             PoloniexModel lastPoloniex = entry.getValue().get(entry.getValue().size() - 1);
 
             this.coinText = "```";
-            this.coinText += "\n https://poloniex.com/exchange#" + lastPoloniex.getName();
+            this.coinText += "\n https://poloniex.com/exchange#" + lastPoloniex.getName() + "" +
+                    "\n BVol:" + lastPoloniex.getBaseVolume()
+                    + " Low/Last/High: " + String.format("%.8f", lastPoloniex.getLow24hr()) + "/" + String.format("%.8f", lastPoloniex.getLast()) + "/"+ String.format("%.8f", lastPoloniex.getHigh24hr());
+
+            if (lastPoloniex.getLast()/lastPoloniex.getLow24hr() < 1.01){
+                this.coinText += " ▼";
+            }
+
+            if (lastPoloniex.getLast()/lastPoloniex.getHigh24hr() > 0.99){
+                this.coinText += " △";
+            }
 
             String coinName = lastPoloniex.getName().split("_")[0];
 
