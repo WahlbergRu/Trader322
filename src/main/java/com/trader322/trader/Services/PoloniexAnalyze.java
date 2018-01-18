@@ -1,6 +1,7 @@
 package com.trader322.trader.Services;
 
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.trader322.trader.ChatBot.BotMessageListener;
 import com.trader322.trader.Model.PoloniexModel;
 import com.trader322.trader.Repository.PoloniexCurrencyRepository;
@@ -82,70 +83,59 @@ public class PoloniexAnalyze {
                     "\n BVol:" + lastPoloniex.getBaseVolume()
                     + " Low/Last/High: " + String.format("%.8f", lastPoloniex.getLow24hr()) + "/" + String.format("%.8f", lastPoloniex.getLast()) + "/"+ String.format("%.8f", lastPoloniex.getHigh24hr());
 
+            Boolean extremium = false;
+
             if (lastPoloniex.getLast()/lastPoloniex.getLow24hr() < 1.01){
                 this.coinText += " ▼";
+                extremium = true;
             }
 
             if (lastPoloniex.getLast()/lastPoloniex.getHigh24hr() > 0.99){
                 this.coinText += " △";
+                extremium = true;
             }
 
-            String coinName = lastPoloniex.getName().split("_")[0];
+            if (extremium == true){
 
-            String cacheString = this.coinText;
+                String coinName = lastPoloniex.getName().split("_")[0];
 
-            entry.getValue().forEach(
-                (PoloniexModel poloniexModel) -> {
+                String cacheString = this.coinText;
 
-                    if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 60001)){
-                        this.sendMessage(lastPoloniex, poloniexModel, "1 minute:  ");
-                    } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 120000)) {
-                        this.sendMessage(lastPoloniex, poloniexModel, "2 minute:  ");
-                    } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 300000)) {
-                        this.sendMessage(lastPoloniex, poloniexModel, "5 minute:  ");
-                    } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 600000)) {
-                        this.sendMessage(lastPoloniex, poloniexModel, "10 minute: ");
-                    } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 900000)) {
-                        this.sendMessage(lastPoloniex, poloniexModel, "15 minute: ");
-                    } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 1200000)) {
-                        this.sendMessage(lastPoloniex, poloniexModel, "20 minute: ");
-                    } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 1500000)) {
-                        this.sendMessage(lastPoloniex, poloniexModel, "25 minute: ");
-                    } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 1800000)) {
-                        this.sendMessage(lastPoloniex, poloniexModel, "30 minute: ");
-                    } else {
+                entry.getValue().forEach(
+                        (PoloniexModel poloniexModel) -> {
 
-                    }
-                }
-            );
+                            if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 60001)){
+                                this.sendMessage(lastPoloniex, poloniexModel, "1 minute:  ");
+                            } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 120000)) {
+                                this.sendMessage(lastPoloniex, poloniexModel, "2 minute:  ");
+                            } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 300000)) {
+                                this.sendMessage(lastPoloniex, poloniexModel, "5 minute:  ");
+                            } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 600000)) {
+                                this.sendMessage(lastPoloniex, poloniexModel, "10 minute: ");
+                            } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 900000)) {
+                                this.sendMessage(lastPoloniex, poloniexModel, "15 minute: ");
+                            } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 1200000)) {
+                                this.sendMessage(lastPoloniex, poloniexModel, "20 minute: ");
+                            } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 1500000)) {
+                                this.sendMessage(lastPoloniex, poloniexModel, "25 minute: ");
+                            } else if (Utils.timeBorders(poloniexModel.getPoloniexIdentity().getTimestamp(), currentTime, 1800000)) {
+                                this.sendMessage(lastPoloniex, poloniexModel, "30 minute: ");
+                            } else {
 
-
-
-            if (!cacheString.equals(this.coinText)){
-                this.coinText += "```";
-                this.botMessageListener.SendMessage(
-                        coinName,
-                        this.coinText
+                            }
+                        }
                 );
+
+
+
+                if (!cacheString.equals(this.coinText)){
+                    this.coinText += "```";
+                    this.botMessageListener.SendMessage(
+                            coinName,
+                            this.coinText
+                    );
+                }
             }
-
-//            System.out.println(entry.getValue());
-
-//            Stream<PoloniexModel> streamSortedListPoloniexModel = entry.getValue()
-//                    .stream()
-//                    .sorted(Comparator.comparingLong(f -> f.getPoloniexIdentity().getTimestamp()));
-//
-//            PoloniexModel poloniexModelFirst = streamSortedListPoloniexModel.findFirst().get();
-//
-//            streamSortedListPoloniexModel.filter(
-//                    poloniexModel -> {
-//                        (poloniexModel.getLast() - poloniexModelFirst.getLast())
-//                    }
-//                );
-//
-//            System.out.println("item " + entry.getKey() + " count : ");
-//
-//            System.out.println("Item : " + entry.getKey() + " Count : " + entry.getValue());
         }
     }
 
